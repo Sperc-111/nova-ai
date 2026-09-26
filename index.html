@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NOVA AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#000;color:#fff;font-family:sans-serif;display:flex;flex-direction:column;height:100vh;margin:0}
+#chat{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column}
+.msg{margin:10px 0;padding:12px;border-radius:10px;max-width:80%}
+.user{background:#444;align-self:flex-end}
+.ai{background:#1a1a1a;border:1px solid #333;align-self:flex-start}
+#box{display:flex;padding:15px;gap:10px;border-top:1px solid #222}
+input{flex:1;padding:12px;border-radius:8px;border:none;background:#222;color:#fff}
+button{padding:12px 20px;border-radius:8px;border:none;background:#fff;color:#000;font-weight:bold}
+</style>
+</head>
+<body>
+<div id="chat"><div class="msg ai">Hello, I am NOVA. How can I help you today?</div></div>
+<div id="box">
+<input id="prompt" placeholder="Ask NOVA anything...">
+<button onclick="send()">Send</button>
+</div>
+<script>
+async function send(){
+ const input=document.getElementById('prompt');
+ const p=input.value.trim(); if(!p) return;
+ const chat=document.getElementById('chat');
+ chat.innerHTML+=`<div class="msg user">${p}</div>`;
+ input.value='';
+ try{
+  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p})});
+  const data=await res.json();
+  const ans=data.choices?.[0]?.message?.content||"Error";
+  chat.innerHTML+=`<div class="msg ai">${ans}</div>`;
+ }catch(e){chat.innerHTML+=`<div class="msg ai">Error: ${e.message}</div>`}
+}
+</script>
+</body>
+</html>
